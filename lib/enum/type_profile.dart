@@ -1,0 +1,4 @@
+enum TypeProfile {
+  client,
+  worker,
+}

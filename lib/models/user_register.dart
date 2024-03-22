@@ -15,6 +15,7 @@ class UserAddressRegister {
 }
 
 class User {
+  String? id;
   String typeProfile;
   String name;
   String email;
@@ -23,6 +24,7 @@ class User {
   UserAddressRegister? address;
 
   User({
+    this.id,
     required this.typeProfile,
     required this.name,
     required this.cpf,

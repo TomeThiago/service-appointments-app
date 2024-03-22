@@ -3,6 +3,7 @@ import 'package:app/screens/home.dart';
 import 'package:app/screens/select_profile.dart';
 import 'package:app/service/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -21,13 +22,13 @@ class _SignInState extends State<SignIn> {
 
   handleLogin(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      var authService = AuthService();
+      var authProvider = context.read<AuthServiceProvider>();
 
       String email = emailController.text;
       String password = passwordController.text;
 
       try {
-        var user = await authService.signIn(email, password);
+        var user = await authProvider.signIn(email, password);
 
         if (user != null) {
           Navigator.push(

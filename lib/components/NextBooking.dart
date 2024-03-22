@@ -1,27 +1,23 @@
-import 'package:app/utils/numbers.dart';
 import 'package:flutter/material.dart';
 import 'package:app/components/button.dart';
+import 'package:app/components/button_outline.dart';
 import 'package:intl/intl.dart';
 
-import '../consts/profile.dart';
-
-class CardNearbyProfessional extends StatelessWidget {
-  final String? avatarUrl;
+class NextBooking extends StatelessWidget {
   final String name;
-  final int totalBookings;
-  final double priceHour;
-  final double distance;
-  final Function()? onPressed;
+  final String position;
 
-  const CardNearbyProfessional({
-    super.key,
-    this.avatarUrl,
+  const NextBooking({
+    Key? key,
     required this.name,
-    required this.totalBookings,
-    required this.priceHour,
-    required this.distance,
-    required this.onPressed,
-  });
+    required this.position,
+  }) : super(key: key);
+
+  String formatMoney(double value) {
+    final formatINTL = NumberFormat("#,##0.00", "pt_BR");
+
+    return formatINTL.format(value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +34,12 @@ class CardNearbyProfessional extends StatelessWidget {
           color: Colors.white,
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(avatarUrl ?? ProfileConst.avatarUrl,
+              child: Image.network(
+                'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
@@ -60,24 +57,24 @@ class CardNearbyProfessional extends StatelessWidget {
                       fontSize: 14.0,
                     ),
                   ),
-                  const SizedBox(height: 12.0),
+                  const SizedBox(height: 4.0),
                   Text(
-                    '$totalBookings agendamentos',
+                    position,
                     style: const TextStyle(
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w600,
                       fontSize: 12.0,
                       color: Color.fromRGBO(101, 101, 101, 1),
                     ),
                   ),
-                  const SizedBox(height: 12.0),
+                  const SizedBox(height: 4.0),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'R\$ ${formatMoney(priceHour)}',
+                        'R\$ ${formatMoney(50.0)}',
                         style: const TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 16.0,
+                          fontSize: 14.0,
                           color: Colors.deepOrange,
                         ),
                       ),
@@ -86,7 +83,7 @@ class CardNearbyProfessional extends StatelessWidget {
                         '/hora',
                         style: TextStyle(
                           fontWeight: FontWeight.w400,
-                          fontSize: 10.0,
+                          fontSize: 14.0,
                           color: Color.fromRGBO(101, 101, 101, 1),
                         ),
                       ),
@@ -99,22 +96,21 @@ class CardNearbyProfessional extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                SizedBox(
-                  height: 38,
-                  child: Text(
-                    '$distance Km',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14.0,
-                      color: Color.fromRGBO(101, 101, 101, 1),
-                    ),
+                Text(
+                  '10/03/2024',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.0,
+                    color: Color.fromRGBO(101, 101, 101, 1),
                   ),
                 ),
-                Button(
-                  title: 'Agendar',
+                SizedBox(
+                  height: 6,
+                ),
+                ButtonOutline(
+                  title: 'Cancelar',
                   height: 30,
-                  fontSize: 14,
-                  onPressed: onPressed,
+                  onPressed: () {},
                 ),
               ],
             ),

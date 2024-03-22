@@ -1,11 +1,15 @@
 import 'package:app/components/button.dart';
 import 'package:app/models/user_register.dart';
+import 'package:app/screens/dashboard.dart';
 import 'package:app/screens/home.dart';
 import 'package:app/screens/select_category.dart';
 import 'package:app/screens/sign_in.dart';
 import 'package:app/service/auth.dart';
+import 'package:app/service/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:provider/provider.dart';
 
 class AddressRegister extends StatefulWidget {
   final User user;
@@ -28,94 +32,116 @@ class _AddressRegisterState extends State<AddressRegister> {
   TextEditingController cityController = TextEditingController();
   TextEditingController complementController = TextEditingController();
 
-  void handleSubmit() async {
-    if (_formKey.currentState!.validate()) {
-      var userAddress = UserAddressRegister(
-        cep: cepController.text,
-        street: addressController.text,
-        neighborhood: neighbourhoodController.text,
-        city: cityController.text,
-        complement: complementController.text,
-      );
-
-      widget.user.address = userAddress;
-
-      debugPrint(widget.user.typeProfile);
-      debugPrint(widget.user.name);
-      debugPrint(widget.user.cpf);
-      debugPrint(widget.user.address?.street);
-      debugPrint(widget.user.address?.neighborhood);
-
-      AuthService authService = AuthService();
-
-      try {
-        await authService.signUp(widget.user.email, widget.user.password);
-
-        if(widget.user.typeProfile == 'client') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const Home(),
-            ),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SelectCategory(),
-            ),
-          );
-        }
-      } on firebase_auth.FirebaseAuthException catch (e) {
-        String message = 'Ocorreu um erro inesperado. Por favor, tente novamente.';
-
-        if (e.code == 'weak-password') {
-          message = 'A senha é muito fraca, por favor tente uma senha mais forte';
-        } else if (e.code == 'email-already-in-use') {
-          message = 'Já existe uma conta com este e-mail se a conta for sua tente fazer o login';
-        }
-
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Erro ao criar o usuário'),
-              content: Text(message),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } catch (e) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Erro ao criar o usuário'),
-              content: const Text('Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    void handleSubmit() async {
+      if (_formKey.currentState!.validate()) {
+        var userAddress = UserAddressRegister(
+          cep: cepController.text,
+          street: addressController.text,
+          neighborhood: neighbourhoodController.text,
+          city: cityController.text,
+          complement: complementController.text,
+        );
+
+        widget.user.address = userAddress;
+
+        var authProvider = context.read<AuthServiceProvider>();
+
+        try {
+          var userCreated =
+          await authProvider.signUp(widget.user.email, widget.user.password);
+
+          Database database = Database();
+
+          widget.user.id = userCreated?.uid;
+
+          final userEntity = <String, dynamic>{
+            'id': widget.user.id,
+            'typeProfile': widget.user.typeProfile,
+            'name': widget.user.name,
+            'cpf': widget.user.cpf,
+            'email': widget.user.email,
+            'address': widget.user.address != null
+                ? {
+              'cep': widget.user.address!.cep,
+              'street': widget.user.address!.street,
+              'neighborhood': widget.user.address!.neighborhood,
+              'city': widget.user.address!.city,
+              'complement': widget.user.address!.complement ?? ''
+            }
+                : null,
+          };
+
+          await database.insertData("users", userEntity);
+
+          if (widget.user.typeProfile == 'client') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const Home(),
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SelectCategory(),
+              ),
+            );
+          }
+        } on firebase_auth.FirebaseAuthException catch (e) {
+          String message =
+              'Ocorreu um erro inesperado. Por favor, tente novamente.';
+
+          if (e.code == 'weak-password') {
+            message =
+            'A senha é muito fraca, por favor tente uma senha mais forte';
+          } else if (e.code == 'email-already-in-use') {
+            message =
+            'Já existe uma conta com este e-mail se a conta for sua tente fazer o login';
+          }
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Erro ao criar o usuário'),
+                content: Text(message),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        } catch (e) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Erro ao criar o usuário'),
+                content: const Text(
+                    'Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
@@ -244,7 +270,7 @@ class _AddressRegisterState extends State<AddressRegister> {
                         controller: complementController,
                         decoration: const InputDecoration(
                           labelText: 'Complemento (opcional)',
-                          hintText: 'Digite a sua cidade',
+                          hintText: 'Digite o complemento do endereço',
                         ),
                       ),
                       const SizedBox(
