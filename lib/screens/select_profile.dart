@@ -88,14 +88,14 @@ class SelectProfile extends StatelessWidget {
               children: [
                 ButtonOutline(
                   title: 'Busco um serviço',
-                  onPressed: () => handleSelectProfile(context, 'client'),
+                  onPressed: () => handleSelectProfile(context, 'worker'),
                 ),
                 const SizedBox(
                   height: 8.0,
                 ),
                 ButtonOutline(
                   title: 'Busco um profissional',
-                  onPressed: () => handleSelectProfile(context, 'worker'),
+                  onPressed: () => handleSelectProfile(context, 'client'),
                 ),
                 const SizedBox(
                   height: 16.0,

@@ -1,5 +1,5 @@
 import 'package:app/components/button.dart';
-import 'package:app/models/user_register.dart' ;
+import 'package:app/models/user_register.dart';
 import 'package:app/screens/address_register.dart';
 import 'package:app/screens/sign_in.dart';
 import 'package:flutter/material.dart';
@@ -206,9 +206,11 @@ class _UserRegisterState extends State<UserRegister> {
                       TextButton(
                         onPressed: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const SignIn()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SignIn(),
+                            ),
+                          );
                         },
                         child: const Text(
                           'Fazer Login',

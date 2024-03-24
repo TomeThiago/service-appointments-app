@@ -1,3 +1,4 @@
+import 'package:app/models/category.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Address {
@@ -36,7 +37,7 @@ class LoggedUser {
   String? avatarUrl;
   String? categoryId;
   String? categoryTitle;
-  List<String>? services;
+  List<Service>? services;
   Address? address;
 
   LoggedUser({
@@ -56,7 +57,20 @@ class LoggedUser {
   factory LoggedUser.toModel(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
 
-    return LoggedUser(
+    List<Service> listServices = [];
+
+    if(data['typeProfile'] == 'worker') {
+      if (data.containsKey("services")) {
+        List<dynamic> servicesData = data["services"];
+
+        listServices = servicesData.map((serviceData) => Service(
+          id: serviceData["id"],
+          title: ''
+        )).toList();
+      }
+    }
+
+    LoggedUser loggedUser = LoggedUser(
       id: snapshot.id,
       typeProfile: data['typeProfile'],
       name: data['name'],
@@ -65,8 +79,10 @@ class LoggedUser {
       bio: data['bio'],
       avatarUrl: data['avatarUrl'],
       categoryId: data['categoryId'],
-      services: List<String>.from(data['services'] ?? []),
       address: Address.toModel(data['address']),
+      services: listServices,
     );
+
+    return loggedUser;
   }
 }

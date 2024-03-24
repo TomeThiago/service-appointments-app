@@ -27,7 +27,10 @@ class CategoryOption extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(imageUrl, height: 30,),
+            Image.asset(
+              imageUrl,
+              height: 48,
+            ),
             const SizedBox(
               height: 4.0,
             ),
@@ -36,7 +39,7 @@ class CategoryOption extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
-                fontSize: 12.0,
+                fontSize: 16.0,
               ),
             ),
           ],

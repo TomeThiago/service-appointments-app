@@ -5,7 +5,9 @@ import 'package:app/screens/select_services.dart';
 import 'package:flutter/material.dart';
 
 class SelectCategory extends StatefulWidget {
-  const SelectCategory({Key? key}) : super(key: key);
+  final bool? isFirstAccess;
+
+  const SelectCategory({super.key, this.isFirstAccess = false});
 
   @override
   State<SelectCategory> createState() => _SelectCategoryState();

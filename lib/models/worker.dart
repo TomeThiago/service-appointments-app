@@ -25,6 +25,7 @@ class Worker {
   String? categoryTitle;
   String? address;
   int? totalBookings;
+  double? distance;
   List<ServiceAvailable>? serviceAvailable;
 
   Worker({
@@ -34,6 +35,7 @@ class Worker {
     this.categoryId,
     this.categoryTitle,
     this.address,
+    this.distance,
     this.serviceAvailable,
   });
 

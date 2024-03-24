@@ -1,6 +1,7 @@
 import 'package:app/components/button.dart';
 import 'package:app/consts/profile.dart';
 import 'package:app/models/booking.dart';
+import 'package:app/models/logged_user.dart';
 import 'package:app/models/selected_booking.dart';
 import 'package:app/repositories/booking_repository.dart';
 import 'package:app/service/auth.dart';
@@ -28,7 +29,7 @@ class _AddAppointmentsState extends State<AddAppointments> {
 
   List<String> availableTimes = [];
 
-  List<String> getAvailableHours() {
+  Future<List<String>> getAvailableHours() async {
     availableTimes = [];
 
     DateTime now = _selectedDay;
@@ -37,7 +38,7 @@ class _AddAppointmentsState extends State<AddAppointments> {
     int endHour = 17;
 
     for (int hour = startHour; hour <= endHour; hour++) {
-      for (int minute = 0; minute < 60; minute += 30) {
+      for (int minute = 0; minute < 60; minute += 60) {
         DateTime currentHour = DateTime(now.year, now.month, now.day, hour, minute);
 
         if (currentHour.isAfter(now)) {
@@ -49,21 +50,29 @@ class _AddAppointmentsState extends State<AddAppointments> {
       }
     }
 
-    return availableTimes;
+    List<String> listUnavailableHours = await BookingRepository().getHoursUnavailable(widget.selectedBooking.worker.id, _selectedDay);
+
+    List<String> results = [];
+
+    for (var element in availableTimes) {
+      if(!listUnavailableHours.contains(element)) {
+        results.add(element);
+      }
+    }
+
+    return results;
   }
 
-  void updateAvailableHours(DateTime selectedDay) {
-    setState(() {
-      _selectedDay = selectedDay;
-      availableTimes = getAvailableHours();
-    });
+  void updateAvailableHours(DateTime selectedDay) async {
+    _selectedDay = selectedDay;
+    availableTimes = await getAvailableHours();
+    setState(() {});
   }
 
-  void updateAvailableHoursToday() {
-    setState(() {
-      _selectedDay = DateTime.now();
-      availableTimes = getAvailableHours();
-    });
+  void updateAvailableHoursToday() async {
+    _selectedDay = DateTime.now();
+    availableTimes = await getAvailableHours();
+    setState(() {});
   }
 
   @override
@@ -77,9 +86,25 @@ class _AddAppointmentsState extends State<AddAppointments> {
     updateAvailableHoursToday();
   }
 
+  String formatAddress(LoggedUser user) {
+    if(user.address?.complement != null && user.address!.complement.isNotEmpty) {
+      return '${user.address?.street} - ${user.address?.complement}, ${user.address?.neighborhood}, ${user.address?.cep}';
+    }
+
+    return '${user.address?.street}, ${user.address?.neighborhood}, ${user.address?.cep}';
+  }
+
   @override
   Widget build(BuildContext context) {
     var user = context.watch<AuthServiceProvider>().loggedUser;
+
+    String getAvatarUrl() {
+      if(widget.selectedBooking.worker.avatarUrl == null || widget.selectedBooking.worker.avatarUrl!.isEmpty) {
+        return ProfileConst.avatarUrl;
+      }
+
+      return widget.selectedBooking.worker.avatarUrl ?? ProfileConst.avatarUrl;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -104,7 +129,7 @@ class _AddAppointmentsState extends State<AddAppointments> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(widget.selectedBooking.worker.avatarUrl ?? ProfileConst.avatarUrl),
+                  backgroundImage: NetworkImage(getAvatarUrl()),
                   radius: 32,
                 ),
                 const SizedBox(
@@ -279,9 +304,9 @@ class _AddAppointmentsState extends State<AddAppointments> {
                       Row(
                         children: [
                           Icon(
-                            _typePayment == 'Pix' ? Icons.pix_sharp : Icons.credit_card,
+                            _typePayment == 'Pix' ? Icons.pix_sharp : _typePayment == 'Dinheiro' ? Icons.monetization_on : Icons.credit_card,
                             size: 32,
-                            color: _typePayment == 'Pix' ? const Color.fromRGBO(33, 154, 122, 1) : Colors.black54,
+                            color: Colors.deepOrange,
                           ),
                           const SizedBox(
                             width: 8.0,
@@ -295,7 +320,62 @@ class _AddAppointmentsState extends State<AddAppointments> {
                         ],
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  ListTile(
+                                    leading: const Icon(Icons.monetization_on),
+                                    title: const Text('Dinheiro'),
+                                    onTap: () {
+                                      setState(() {
+                                        _typePayment = 'Dinheiro';
+                                      });
+
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(Icons.credit_card),
+                                    title: const Text('Cartão de Crédito'),
+                                    onTap: () {
+                                      setState(() {
+                                        _typePayment = 'Cartão de Crédito';
+                                      });
+
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(Icons.credit_card),
+                                    title: const Text('Cartão de Débito'),
+                                    onTap: () {
+                                      setState(() {
+                                        _typePayment = 'Cartão de Débito';
+                                      });
+
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(Icons.pix_sharp),
+                                    title: const Text('Pix'),
+                                    onTap: () {
+                                      setState(() {
+                                        _typePayment = 'Pix';
+                                      });
+
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                         child: const Text(
                           'Mudar',
                           style: TextStyle(
@@ -335,6 +415,7 @@ class _AddAppointmentsState extends State<AddAppointments> {
                   data: dateTime.toString(),
                   typePayment: _typePayment,
                   value: widget.selectedBooking.value,
+                  address: formatAddress(user),
                   status: 'Pendente',
                 );
 

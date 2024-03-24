@@ -38,6 +38,14 @@ class AuthServiceProvider with ChangeNotifier, DiagnosticableTreeMixin {
           var category = await CategoryRepository().getCategoryById(loggedUser?.categoryId ?? '');
 
           loggedUser?.categoryTitle = category?.title ?? 'Não Informado';
+
+          loggedUser!.services?.forEach((element) {
+            category?.services?.forEach((serviceElement) {
+              if(serviceElement.id == element.id) {
+                element.title = serviceElement.title;
+              }
+            });
+          });
       }
     }
 

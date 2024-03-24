@@ -2,17 +2,13 @@ import 'dart:async';
 
 import 'package:app/components/card_nearby_professional.dart';
 import 'package:app/models/category.dart';
+import 'package:app/models/logged_user.dart';
 import 'package:app/models/selected_booking.dart';
 import 'package:app/models/worker.dart';
-import 'package:app/repositories/booking_repository.dart';
-import 'package:app/repositories/category_repository.dart';
 import 'package:app/repositories/user_repository.dart';
 import 'package:app/screens/add_appointments.dart';
-import 'package:app/screens/filter_service.dart';
-import 'package:app/screens/sign_in.dart';
+import 'package:app/service/maps.dart';
 import 'package:flutter/material.dart';
-import 'package:app/components/category_option.dart';
-import 'package:app/components/header_home.dart';
 import 'package:app/service/auth.dart';
 import 'package:provider/provider.dart';
 
@@ -28,19 +24,43 @@ class SelectWorker extends StatefulWidget {
 }
 
 class _SelectWorkerState extends State<SelectWorker> {
-  Future<List<Worker>> fetchWorkers() async {
-    List<Worker> workers =
-        await UserRepository().getWorkers(widget.category, widget.service);
-
-    return workers;
-  }
-
   @override
   Widget build(BuildContext context) {
     var user = context.watch<AuthServiceProvider>().loggedUser;
 
-    getDistanceBetweenClientAndWorker() {
-      return 0.5;
+    String formatAddress(LoggedUser user) {
+      if (user.address?.complement != null &&
+          user.address!.complement.isNotEmpty) {
+        return '${user.address?.street} - ${user.address?.complement}, ${user.address?.neighborhood}, ${user.address?.cep}';
+      }
+
+      return '${user.address?.street}, ${user.address?.neighborhood}, ${user.address?.cep}';
+    }
+
+    getDistanceBetweenClientAndWorker(Worker worker) async {
+      if(worker.address != null) {
+        var workerAddress = await getCoordinates(worker.address!);
+
+        var userAddress = await getCoordinates(formatAddress(user!));
+
+        double distance = calculateDistance(workerAddress?['latitude'], workerAddress?['longitude']!, userAddress?['latitude'], userAddress?['longitude']!);
+
+        return double.parse(distance.toStringAsFixed(1));
+      }
+
+      return 999.0;
+    }
+
+    Future<List<Worker>> fetchWorkers() async {
+      List<Worker> workers = await UserRepository().getWorkers(widget.category, widget.service);
+
+      for(var worker in workers) {
+        worker.distance = await getDistanceBetweenClientAndWorker(worker);
+      }
+
+      workers.sort((workerA, workerB) => (workerA.distance ?? 0).compareTo(workerB.distance ?? 0));
+
+      return workers;
     }
 
     getPrice(Worker worker) {
@@ -70,10 +90,6 @@ class _SelectWorkerState extends State<SelectWorker> {
           ),
         ),
       );
-    }
-
-    Future<int> getTotalBookings(String workerId) async {
-      return await BookingRepository().getTotalBookingsByWorkerId(workerId);
     }
 
     return Scaffold(
@@ -153,7 +169,7 @@ class _SelectWorkerState extends State<SelectWorker> {
                             name: worker.name,
                             totalBookings: worker.totalBookings ?? 0,
                             priceHour: getPrice(worker),
-                            distance: getDistanceBetweenClientAndWorker(),
+                            distance: worker.distance ?? 5.0,
                             onPressed: () => handleBooking(worker),
                           );
                         },

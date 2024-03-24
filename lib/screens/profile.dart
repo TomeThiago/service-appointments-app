@@ -1,6 +1,4 @@
 import 'package:app/consts/profile.dart';
-import 'package:app/models/category.dart';
-import 'package:app/repositories/category_repository.dart';
 import 'package:app/screens/edit_address.dart';
 import 'package:app/screens/edit_user.dart';
 import 'package:app/screens/select_category.dart';
@@ -109,10 +107,10 @@ class _ProfileState extends State<Profile> {
                 const SizedBox(
                   height: 16,
                 ),
-                Visibility(
-                  visible: user?.typeProfile == 'worker',
-                  child: ServiceList(),
-                ),
+                // Visibility(
+                //   visible: user?.typeProfile == 'worker',
+                //   child: ServiceList(),
+                // ),
                 const Text(
                   'Opções',
                   style: TextStyle(
@@ -250,11 +248,17 @@ class _ProfileState extends State<Profile> {
 }
 
 class ServiceList extends StatelessWidget {
+  const ServiceList({super.key});
+
   @override
   Widget build(BuildContext context) {
     var user = context.watch<AuthServiceProvider>().loggedUser;
 
-    List<String> services = user?.services ?? [];
+    List<String> services = [];
+
+    for (var element in user!.services!) {
+      services.add(element.title);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,7 +289,7 @@ class ServiceList extends StatelessWidget {
               )
               .toList(),
         ),
-        SizedBox(
+        const SizedBox(
           height: 8.0,
         ),
       ],

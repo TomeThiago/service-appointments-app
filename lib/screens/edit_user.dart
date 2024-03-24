@@ -1,8 +1,5 @@
 import 'package:app/components/button.dart';
-import 'package:app/models/user_register.dart';
 import 'package:app/repositories/user_repository.dart';
-import 'package:app/screens/address_register.dart';
-import 'package:app/screens/sign_in.dart';
 import 'package:app/service/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -49,6 +46,8 @@ class _EditUserState extends State<EditUser> {
         user.name = nameController.text;
         user.cpf = cpfController.text;
         user.bio = bioController.text;
+
+        authProvider.loggedUser = await UserRepository().getUserByEmail(user.email);
 
         Navigator.pop(context);
       }
@@ -135,7 +134,7 @@ class _EditUserState extends State<EditUser> {
                   hintText: 'Digite sobre você',
                   border: OutlineInputBorder(),
                 ),
-                maxLines: 2,
+                maxLines: 5,
               ),
               const SizedBox(
                 height: 32.0,

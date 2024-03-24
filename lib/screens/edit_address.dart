@@ -1,17 +1,8 @@
 import 'package:app/components/button.dart';
-import 'package:app/models/category.dart';
 import 'package:app/models/logged_user.dart';
-import 'package:app/models/user_register.dart';
 import 'package:app/repositories/user_repository.dart';
-import 'package:app/screens/dashboard.dart';
-import 'package:app/screens/home.dart';
-import 'package:app/screens/select_category.dart';
-import 'package:app/screens/sign_in.dart';
 import 'package:app/service/auth.dart';
-import 'package:app/service/database.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:provider/provider.dart';
 
 class EditAddress extends StatefulWidget {

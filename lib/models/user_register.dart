@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class UserAddressRegister {
   String cep;
   String street;
@@ -21,6 +23,7 @@ class User {
   String email;
   String cpf;
   String password;
+  String? avatarUrl;
   UserAddressRegister? address;
 
   User({
@@ -31,5 +34,20 @@ class User {
     required this.email,
     required this.password,
     this.address,
+    this.avatarUrl,
   });
+
+  factory User.toModel(DocumentSnapshot snapshot) {
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+    return User(
+      id: snapshot.id,
+      name: data['name'],
+      cpf: data['cpf'],
+      email: data['email'],
+      password: '',
+      typeProfile: data['typeProfile'],
+      avatarUrl: data['avatarUrl'],
+    );
+  }
 }

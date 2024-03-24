@@ -1,5 +1,6 @@
 import 'package:app/models/category.dart';
 import 'package:app/models/logged_user.dart';
+import 'package:app/models/user_register.dart';
 import 'package:app/models/worker.dart';
 import 'package:app/repositories/booking_repository.dart';
 import 'package:app/repositories/category_repository.dart';
@@ -12,6 +13,18 @@ class UserRepository {
 
   Future<dynamic> insertData(String collectionName, dynamic data) async {
     return _db.collection(_userTable).add(data);
+  }
+
+  Future<User?> getUserById(String workerId) async {
+    DocumentSnapshot userSnapshot = await _db.collection(_userTable).doc(workerId).get();
+
+    if (userSnapshot.exists) {
+      User user = User.toModel(userSnapshot);
+
+      return user;
+    }
+
+    return null;
   }
 
   Future<LoggedUser> getUserByEmail(String email) async {

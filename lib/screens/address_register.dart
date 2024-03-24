@@ -1,12 +1,9 @@
 import 'package:app/components/button.dart';
 import 'package:app/models/user_register.dart';
-import 'package:app/screens/dashboard.dart';
 import 'package:app/screens/home.dart';
-import 'package:app/screens/select_category.dart';
 import 'package:app/screens/sign_in.dart';
 import 'package:app/service/auth.dart';
 import 'package:app/service/database.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:provider/provider.dart';
@@ -49,8 +46,8 @@ class _AddressRegisterState extends State<AddressRegister> {
         var authProvider = context.read<AuthServiceProvider>();
 
         try {
-          var userCreated =
-          await authProvider.signUp(widget.user.email, widget.user.password);
+          var userCreated = await authProvider.signUp(
+              widget.user.email, widget.user.password);
 
           Database database = Database();
 
@@ -64,42 +61,35 @@ class _AddressRegisterState extends State<AddressRegister> {
             'email': widget.user.email,
             'address': widget.user.address != null
                 ? {
-              'cep': widget.user.address!.cep,
-              'street': widget.user.address!.street,
-              'neighborhood': widget.user.address!.neighborhood,
-              'city': widget.user.address!.city,
-              'complement': widget.user.address!.complement ?? ''
-            }
+                    'cep': widget.user.address!.cep,
+                    'street': widget.user.address!.street,
+                    'neighborhood': widget.user.address!.neighborhood,
+                    'city': widget.user.address!.city,
+                    'complement': widget.user.address!.complement ?? ''
+                  }
                 : null,
           };
 
           await database.insertData("users", userEntity);
 
-          if (widget.user.typeProfile == 'client') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const Home(),
-              ),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SelectCategory(),
-              ),
-            );
-          }
+          await authProvider.signIn(widget.user.email, widget.user.password);
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Home(),
+            ),
+          );
         } on firebase_auth.FirebaseAuthException catch (e) {
           String message =
               'Ocorreu um erro inesperado. Por favor, tente novamente.';
 
           if (e.code == 'weak-password') {
             message =
-            'A senha é muito fraca, por favor tente uma senha mais forte';
+                'A senha é muito fraca, por favor tente uma senha mais forte';
           } else if (e.code == 'email-already-in-use') {
             message =
-            'Já existe uma conta com este e-mail se a conta for sua tente fazer o login';
+                'Já existe uma conta com este e-mail se a conta for sua tente fazer o login';
           }
 
           showDialog(
@@ -292,9 +282,11 @@ class _AddressRegisterState extends State<AddressRegister> {
                           TextButton(
                             onPressed: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const SignIn()));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SignIn(),
+                                ),
+                              );
                             },
                             child: const Text(
                               'Fazer Login',

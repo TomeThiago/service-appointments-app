@@ -1,8 +1,7 @@
 import 'package:app/consts/profile.dart';
-import 'package:app/utils/numbers.dart';
 import 'package:flutter/material.dart';
 
-class AppointmentCard extends StatelessWidget {
+class NextBookingCard extends StatelessWidget {
   final String id;
   final String name;
   final String photoUrl;
@@ -13,10 +12,8 @@ class AppointmentCard extends StatelessWidget {
   final String status;
   final String typePayment;
   final double price;
-  final Function()? onConfirm;
-  final Function()? onCancel;
 
-  const AppointmentCard({
+  const NextBookingCard({
     super.key,
     required this.id,
     required this.name,
@@ -28,8 +25,6 @@ class AppointmentCard extends StatelessWidget {
     required this.typePayment,
     required this.price,
     required this.status,
-    required this.onConfirm,
-    required this.onCancel,
   });
 
   @override
@@ -92,7 +87,7 @@ class AppointmentCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(
-                height: 24,
+                height: 4,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -148,8 +143,7 @@ class AppointmentCard extends StatelessWidget {
                   const SizedBox(
                     width: 4,
                   ),
-
-                  Expanded( // Use Expanded para permitir que o texto pule para a próxima linha
+                  Expanded(
                     child: Text(
                       address,
                       style: const TextStyle(
@@ -159,75 +153,7 @@ class AppointmentCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 8,
-              ),
-              Row(
-                children: [
-                  Icon(
-                    typePayment == 'Pix' ? Icons.pix_sharp : typePayment == 'Dinheiro' ? Icons.monetization_on : Icons.credit_card,
-                    color: Colors.deepOrangeAccent,
-                  ),
-                  const SizedBox(
-                    width: 4,
-                  ),
-                  Text(
-                    'R\$ ${formatMoney(price)}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 4,
-              ),
-              Visibility(
-                visible: status == 'Pendente',
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: onConfirm,
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(
-                            width: 2.0,
-                            color: Colors.green,
-                          ),
-                        ),
-                        child: const Text(
-                          'Finalizar',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 16.0,
-                    ),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: onCancel,
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(
-                            width: 2.0,
-                            color: Colors.red,
-                          ),
-                        ),
-                        child: const Text(
-                          'Cancelar',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+
             ],
           ),
         ),

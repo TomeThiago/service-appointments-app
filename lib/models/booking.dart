@@ -1,10 +1,12 @@
 import 'package:app/models/category.dart';
+import 'package:app/models/user_register.dart';
 import 'package:app/models/worker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Booking {
   String? id;
   String userId;
+  User? user;
   String workerId;
   Worker? worker;
   String categoryId;
@@ -12,6 +14,7 @@ class Booking {
   String serviceId;
   Service? service;
   String data;
+  String address;
   String typePayment;
   double value;
   String status;
@@ -26,9 +29,11 @@ class Booking {
     required this.typePayment,
     required this.value,
     required this.status,
+    required this.address,
     this.worker,
     this.category,
     this.service,
+    this.user,
   });
 
   factory Booking.toModel(DocumentSnapshot snapshot) {
@@ -41,6 +46,7 @@ class Booking {
       categoryId: data["categoryId"],
       serviceId: data["serviceId"],
       data: data["data"],
+      address: data["address"],
       typePayment: data["typePayment"],
       value: data["value"],
       status: data["status"],
@@ -56,6 +62,7 @@ class Booking {
       'data': booking.data,
       'typePayment': booking.typePayment,
       'value': booking.value,
+      'address': booking.address,
       'status': booking.status,
     };
 

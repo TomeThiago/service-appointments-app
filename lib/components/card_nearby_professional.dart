@@ -1,7 +1,6 @@
 import 'package:app/utils/numbers.dart';
 import 'package:flutter/material.dart';
 import 'package:app/components/button.dart';
-import 'package:intl/intl.dart';
 
 import '../consts/profile.dart';
 
@@ -25,6 +24,14 @@ class CardNearbyProfessional extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String getAvatarUrl() {
+      if(avatarUrl == null || avatarUrl!.isEmpty) {
+        return ProfileConst.avatarUrl;
+      }
+
+      return avatarUrl ?? ProfileConst.avatarUrl;
+    }
+
     return Card(
       elevation: 4,
       color: Colors.white,
@@ -42,7 +49,7 @@ class CardNearbyProfessional extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(avatarUrl ?? ProfileConst.avatarUrl,
+              child: Image.network(getAvatarUrl(),
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,

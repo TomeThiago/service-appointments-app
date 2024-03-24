@@ -29,6 +29,19 @@ class HeaderHome extends StatelessWidget implements PreferredSizeWidget {
 
     var user = authProvider.loggedUser;
 
+    getAvatarUrl() {
+      if (authProvider.loggedUser == null ||
+          authProvider.loggedUser?.avatarUrl == null) {
+        return ProfileConst.avatarUrl;
+      }
+
+      if (authProvider.loggedUser!.avatarUrl!.isEmpty) {
+        return ProfileConst.avatarUrl;
+      }
+
+      return authProvider.loggedUser!.avatarUrl;
+    }
+
     return AppBar(
       title: Column(
         children: [
@@ -39,19 +52,17 @@ class HeaderHome extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   CircleAvatar(
                     backgroundImage: NetworkImage(
-                      user != null
-                          ? user.avatarUrl ?? ProfileConst.avatarUrl
-                          : ProfileConst.avatarUrl,
+                        getAvatarUrl() ?? ProfileConst.avatarUrl
                     ),
                     radius: 24,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 16.0,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Bem-Vindo',
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
@@ -59,7 +70,7 @@ class HeaderHome extends StatelessWidget implements PreferredSizeWidget {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 2.0,
                       ),
                       Text(

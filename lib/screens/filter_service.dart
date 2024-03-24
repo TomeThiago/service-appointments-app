@@ -1,15 +1,6 @@
-import 'package:app/components/button.dart';
-import 'package:app/models/worker.dart';
-import 'package:app/repositories/user_repository.dart';
-import 'package:app/screens/dashboard.dart';
-import 'package:app/screens/home.dart';
-import 'package:app/screens/profile.dart';
-import 'package:app/screens/select_services_price.dart';
 import 'package:app/screens/select_worker.dart';
-import 'package:app/service/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:app/models/category.dart';
-import 'package:provider/provider.dart';
 
 class FilterService extends StatefulWidget {
   final Category category;
