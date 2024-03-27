@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:app/components/button.dart';
+import 'package:app/consts/profile.dart';
 import 'package:app/repositories/user_repository.dart';
 import 'package:app/service/auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:path/path.dart';
 
 class EditUser extends StatefulWidget {
   const EditUser({
@@ -20,6 +26,8 @@ class _EditUserState extends State<EditUser> {
   Widget build(BuildContext context) {
     var authProvider = context.watch<AuthServiceProvider>();
     var user = authProvider.loggedUser;
+
+    File? _imageFile;
 
     TextEditingController avatarUrlController = TextEditingController(
         text: user?.avatarUrl
@@ -51,6 +59,58 @@ class _EditUserState extends State<EditUser> {
 
         Navigator.pop(context);
       }
+    }
+
+    Future<File?> pickImage(ImageSource source) async {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: source);
+
+      if (pickedFile != null) {
+        return File(pickedFile.path);
+      }
+
+      return null;
+    }
+
+    Future<String> uploadImage(File imageFile) async {
+      String fileName = basename(imageFile.path);
+
+      Reference firebaseStorageRef = FirebaseStorage.instance.ref().child('uploads/$fileName');
+      UploadTask uploadTask = firebaseStorageRef.putFile(imageFile);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return downloadUrl;
+    }
+
+    void _selectImage(ImageSource source) async {
+      File? selected = await pickImage(source);
+
+      setState(() {
+        _imageFile = selected;
+      });
+    }
+
+    void _uploadImage() async {
+      if (_imageFile == null) return;
+
+      String imageUrl = await uploadImage(_imageFile!);
+      print('Uploaded Image URL: $imageUrl');
+    }
+
+    String getAvatarUrl() {
+      if(user == null) {
+        return ProfileConst.avatarUrl;
+      }
+      if(user.avatarUrl == null) {
+        return ProfileConst.avatarUrl;
+      }
+
+      if(user.avatarUrl == '') {
+        return ProfileConst.avatarUrl;
+      }
+
+      return user.avatarUrl!;
     }
 
     return Scaffold(

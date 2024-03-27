@@ -79,6 +79,7 @@ class BookingRepository {
     QuerySnapshot querySnapshot = await _db
         .collection(_bookingTable)
         .where("workerId", isEqualTo: workerId)
+        .where("status", isEqualTo: 'Finalizado')
         .get();
 
     List<QueryDocumentSnapshot> documents = querySnapshot.docs;
