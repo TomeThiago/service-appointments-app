@@ -152,6 +152,8 @@ class _UserRegisterState extends State<UserRegister> {
                       hintText: 'Digite o seu e-mail',
                     ),
                     keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
                     validator: (String? value) {
                       if (value != null && value.isEmpty) {
                         return 'Insira o e-mail para o cadastro';
